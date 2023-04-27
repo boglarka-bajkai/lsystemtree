@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class LSystem
 {
-    //public List<string> Alphabet { get; set; } = new List<string> { "A", "B" };
     public string Axiom { get; set; } = "A";
-    public Dictionary<string, string> Rules { get; set; } = new Dictionary<string, string>() { { "A", "AB"}, { "B", "A"} };
+    public List<Rule> Rules { get; set; } = new List<Rule>() { new Rule("A", "AB"), new Rule("B", "A")};
     public int Iteration { get; set; } = 0;
+    public float Angle { get; set; }
     public string Sentence { get; set; }
 
     public LSystem() 
@@ -15,12 +15,19 @@ public class LSystem
         Sentence = Axiom;
     }
 
-    public LSystem(/*List<string> alphabet,*/ string axiom, Dictionary<string, string> rules) 
+    public LSystem(string axiom, List<Rule> rules) 
     {
-        //Alphabet = alphabet;
         Axiom = axiom;
         Rules = rules;
         Sentence = Axiom;
+    }
+
+    public LSystem(string axiom, List<Rule> rules, float angle)
+    {
+        Axiom = axiom;
+        Rules = rules;
+        Sentence = Axiom;
+        Angle = angle;
     }
 
     public string IterateForward()
@@ -30,12 +37,32 @@ public class LSystem
         foreach (char c in Sentence)
         {
             //tfh egyelore deterministic, context-free
-            if (Rules.ContainsKey(c.ToString())) newSentence += Rules[c.ToString()];
+            if (CheckRulesForKey(c.ToString())) newSentence += FindRule(c.ToString());
             else newSentence += c;
         }
         Sentence = newSentence;
         return Sentence;
     }
 
+    public string GetIteration(int iteration)
+    {
+        Iteration = 0;
+        for(int i = 0; i < iteration-1; i++)
+            IterateForward();
+        return IterateForward();
+    }
 
+    private bool CheckRulesForKey(string key)
+    {
+        foreach(Rule rule in Rules)
+            if (rule.start == key) return true;
+        return false;
+    }
+
+    private string FindRule(string key)
+    {
+        foreach(Rule rule in Rules)
+            if(rule.start == key) return rule.end;
+        return null;
+    }
 }
