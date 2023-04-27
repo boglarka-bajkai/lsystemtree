@@ -23,24 +23,15 @@ public class LSystemObjectBehaviour : MonoBehaviour
 
     public void ButtonClicked()
     {
-        _text.SetText(system.IterateForward());
+        string sentence = system.IterateForward();
+        _text.SetText(sentence);
+        var turtle = gameObject.GetComponent<LTurtle>();
+        turtle.Sentence = sentence;
+        turtle.Angle = 22.5f;
+        turtle.Length = 3f;
+        var b = new Branch(new Vector3(450, 0, 100), new Vector3(450, 10, 100));
+        turtle.Draw();
     }
-
-    /*special rules for drawing (from The Algorithmic Beauty of Plants):
-         * angle : 25 degree
-         * F : draw forward
-         * f : move forward
-         * - : turn right <angle>
-         * + : turn left <angle>
-         * ? : pitch up
-         * & : pitch down
-         * \ : roll left
-         * / : roll right
-         * | : turn around
-         * $ : rotate the turtle to vertical
-         * [ : push position and angle / start a branch
-         * ] : pop position and angle / complete a branch
-        */
 
     public void CreateFractalBinaryTree()
     {
@@ -79,9 +70,8 @@ public class LSystemObjectBehaviour : MonoBehaviour
             new Rule("A", "[&FL!A]/////'[&FL!A]///////’[&FL!A]"),
             new Rule("F", "S ///// F"),
             new Rule("S", "F L"),
-            new Rule("L", "['''??{-f+f+f-|-f+f+f}]")
+            //new Rule("L", "['''??{-f+f+f-|-f+f+f}]")
         };
-        float angle = 22.5f;
-        system = new LSystem(axiom, rules, angle);
+        system = new LSystem(axiom, rules);
     }
 }
