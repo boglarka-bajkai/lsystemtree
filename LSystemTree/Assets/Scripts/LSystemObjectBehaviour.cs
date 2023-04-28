@@ -29,7 +29,6 @@ public class LSystemObjectBehaviour : MonoBehaviour
         turtle.Sentence = sentence;
         turtle.Angle = 22.5f;
         turtle.Length = 3f;
-        var b = new Branch(new Vector3(450, 0, 100), new Vector3(450, 10, 100));
         turtle.Draw();
     }
 
@@ -70,7 +69,7 @@ public class LSystemObjectBehaviour : MonoBehaviour
             new Rule("A", "[&FL!A]/////'[&FL!A]///////’[&FL!A]"),
             new Rule("F", "S ///// F"),
             new Rule("S", "F L"),
-            //new Rule("L", "['''??{-f+f+f-|-f+f+f}]")
+            new Rule("L", "l")
         };
         system = new LSystem(axiom, rules);
     }

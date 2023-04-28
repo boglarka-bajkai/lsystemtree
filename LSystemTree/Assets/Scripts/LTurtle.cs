@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 
 //This is not even a turtle this is a flippin' aeroplane
@@ -24,6 +25,11 @@ public class LTurtle : MonoBehaviour {
 
     private Stack stack = new Stack();
 
+    [SerializeField]
+    private GameObject leaf;
+
+    private Material branchMat;
+
     private void Start()
     {
         plane.Position = gameObject.transform.position;
@@ -31,6 +37,8 @@ public class LTurtle : MonoBehaviour {
         plane.YawAxis = Vector3.forward;
         plane.PitchAxis = Vector3.left;
         plane.RollAxis = Vector3.up;
+
+        branchMat = (Material)Resources.Load("Branch_Material");
     }
 
     /*special rules for drawing (from The Algorithmic Beauty of Plants):
@@ -55,12 +63,8 @@ public class LTurtle : MonoBehaviour {
         {
             if(c == 'F')
             {
-                //draw forward
-                Vector3 start = plane.Position;
-                Vector3 end = plane.Position + Length * plane.Direction;
-                var b = new Branch(start, end);
-                b.Draw();
-                plane.Position = end;
+                //draw branch
+                DrawBranch();
             }
             if (c == 'f')
             {
@@ -71,8 +75,8 @@ public class LTurtle : MonoBehaviour {
             {
                 //turn right <angle> -- yaw
                 plane.Direction = (Quaternion.AngleAxis(-Angle, plane.YawAxis) * plane.Direction).normalized;
-                plane.PitchAxis = (Quaternion.AngleAxis(Angle, plane.YawAxis) * plane.PitchAxis).normalized;
-                plane.RollAxis = (Quaternion.AngleAxis(Angle, plane.YawAxis) * plane.RollAxis).normalized;
+                plane.PitchAxis = (Quaternion.AngleAxis(-Angle, plane.YawAxis) * plane.PitchAxis).normalized;
+                plane.RollAxis = (Quaternion.AngleAxis(-Angle, plane.YawAxis) * plane.RollAxis).normalized;
             }
             if (c == '+')
             {
@@ -85,8 +89,8 @@ public class LTurtle : MonoBehaviour {
             {
                 //pitch up
                 plane.Direction = (Quaternion.AngleAxis(-Angle, plane.PitchAxis) * plane.Direction).normalized;
-                plane.YawAxis = (Quaternion.AngleAxis(Angle, plane.PitchAxis) * plane.YawAxis).normalized;
-                plane.RollAxis = (Quaternion.AngleAxis(Angle, plane.PitchAxis) * plane.RollAxis).normalized;
+                plane.YawAxis = (Quaternion.AngleAxis(-Angle, plane.PitchAxis) * plane.YawAxis).normalized;
+                plane.RollAxis = (Quaternion.AngleAxis(-Angle, plane.PitchAxis) * plane.RollAxis).normalized;
             }
             if (c == '&')
             {
@@ -99,8 +103,8 @@ public class LTurtle : MonoBehaviour {
             {
                 //roll left
                 plane.Direction = (Quaternion.AngleAxis(-Angle, plane.RollAxis) * plane.Direction).normalized;
-                plane.YawAxis = (Quaternion.AngleAxis(Angle, plane.RollAxis) * plane.YawAxis).normalized;
-                plane.PitchAxis = (Quaternion.AngleAxis(Angle, plane.RollAxis) * plane.PitchAxis).normalized;
+                plane.YawAxis = (Quaternion.AngleAxis(-Angle, plane.RollAxis) * plane.YawAxis).normalized;
+                plane.PitchAxis = (Quaternion.AngleAxis(-Angle, plane.RollAxis) * plane.PitchAxis).normalized;
             }
             if (c == '/')
             {
@@ -125,6 +129,30 @@ public class LTurtle : MonoBehaviour {
                 //pop position and angle
                 plane = (Plane)stack.Pop();
             }
+            if (c == 'L')
+            {
+                //draw leaf
+                var leafYaw = (Quaternion.AngleAxis(Angle, plane.PitchAxis) * plane.YawAxis).normalized;
+                var leafDirection = (Quaternion.AngleAxis(-Angle, plane.YawAxis) * plane.Direction).normalized;
+                Instantiate(leaf, plane.Position, Quaternion.LookRotation(leafYaw, plane.Direction));
+            }
         }
+
+
+    }
+
+    public void DrawBranch()
+    {
+        LineRenderer lr = (new GameObject("branch")).AddComponent<LineRenderer>();
+        lr.shadowCastingMode = ShadowCastingMode.On;
+        lr.material = branchMat;
+        lr.positionCount = 2;
+        Vector3[] positions = new Vector3[2];
+        positions[0] = plane.Position;
+        positions[1] = plane.Position + Length * plane.Direction;
+        lr.SetPositions(positions);
+        lr.startWidth = 0.3f;
+        lr.endWidth = 0.2f;
+        plane.Position = positions[1];
     }
 }
