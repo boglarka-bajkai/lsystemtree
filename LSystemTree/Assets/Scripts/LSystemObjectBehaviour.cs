@@ -8,6 +8,7 @@ public class LSystemObjectBehaviour : MonoBehaviour
 {
 
     [SerializeField] private TMP_Text _text;
+    [SerializeField] private TMP_Text _iterationText;
     [SerializeField] private Button _button;
 
     private LSystem system;
@@ -25,6 +26,7 @@ public class LSystemObjectBehaviour : MonoBehaviour
     {
         string sentence = system.IterateForward();
         _text.SetText(sentence);
+        _iterationText.SetText("Iteration: " + system.Iteration);
         var turtle = gameObject.GetComponent<LTurtle>();
         turtle.Sentence = sentence;
         turtle.Angle = 22.5f;
