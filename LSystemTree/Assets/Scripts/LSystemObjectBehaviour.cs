@@ -18,19 +18,26 @@ public class LSystemObjectBehaviour : MonoBehaviour
         //system = new LSystem();
         //CreateFractalBinaryTree();
         //CreateCantorSet();
-        CreateBush();
+        //CreateBush();
+        CreateFractalPlant();
         _text.SetText(system.Axiom);
     }
 
     public void ButtonClicked()
     {
+        //kill all children
+        foreach (Transform child in this.gameObject.transform)
+        {
+            Destroy(child.gameObject);
+        }
         string sentence = system.IterateForward();
         _text.SetText(sentence);
         _iterationText.SetText("Iteration: " + system.Iteration);
         var turtle = gameObject.GetComponent<LTurtle>();
+        turtle.ResetPlane(this.gameObject.transform);
         turtle.Sentence = sentence;
         turtle.Angle = 22.5f;
-        turtle.Length = 3f;
+        turtle.Length = 1f;
         turtle.Draw();
     }
 
@@ -51,7 +58,7 @@ public class LSystemObjectBehaviour : MonoBehaviour
     public void CreateFractalPlant()
     {
         string axiom = "X";
-        var rules = new List<Rule>() { new Rule("X", "F+[[X]-X-F[-FX]+X"), new Rule("F", "FF") };
+        var rules = new List<Rule>() { new Rule("X", "F+[[X]-X]-F[-FX]+X"), new Rule("F", "FF") };
         system = new LSystem(axiom, rules);
     }
 

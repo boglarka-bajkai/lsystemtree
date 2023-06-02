@@ -22,6 +22,7 @@ public class LTurtle : MonoBehaviour {
     public float Length { get; set; }
 
     private Plane plane;
+    private Transform parentTransform;
 
     private Stack stack = new Stack();
 
@@ -32,13 +33,19 @@ public class LTurtle : MonoBehaviour {
 
     private void Start()
     {
-        plane.Position = gameObject.transform.position;
+        ResetPlane(gameObject.transform);
+
+        branchMat = (Material)Resources.Load("Branch_Material");
+    }
+
+    public void ResetPlane(Transform transform)
+    {
+        parentTransform = transform;
+        plane.Position = transform.position;
         plane.Direction = Vector3.up;
         plane.YawAxis = Vector3.forward;
         plane.PitchAxis = Vector3.left;
         plane.RollAxis = Vector3.up;
-
-        branchMat = (Material)Resources.Load("Branch_Material");
     }
 
     /*special rules for drawing (from The Algorithmic Beauty of Plants):
@@ -134,7 +141,8 @@ public class LTurtle : MonoBehaviour {
                 //draw leaf
                 var leafYaw = (Quaternion.AngleAxis(Angle, plane.PitchAxis) * plane.YawAxis).normalized;
                 var leafDirection = (Quaternion.AngleAxis(-Angle, plane.YawAxis) * plane.Direction).normalized;
-                Instantiate(leaf, plane.Position, Quaternion.LookRotation(leafYaw, plane.Direction));
+                var leafObject = Instantiate(leaf, plane.Position, Quaternion.LookRotation(leafYaw, plane.Direction));
+                leafObject.transform.SetParent(parentTransform);
             }
         }
 
@@ -144,6 +152,7 @@ public class LTurtle : MonoBehaviour {
     public void DrawBranch()
     {
         LineRenderer lr = (new GameObject("branch")).AddComponent<LineRenderer>();
+        lr.transform.SetParent(parentTransform, true);
         lr.shadowCastingMode = ShadowCastingMode.On;
         lr.material = branchMat;
         lr.positionCount = 2;
@@ -151,7 +160,7 @@ public class LTurtle : MonoBehaviour {
         positions[0] = plane.Position;
         positions[1] = plane.Position + Length * plane.Direction;
         lr.SetPositions(positions);
-        lr.startWidth = 0.3f;
+        lr.startWidth = 0.2f;
         lr.endWidth = 0.2f;
         plane.Position = positions[1];
     }
